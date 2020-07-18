@@ -42,4 +42,5 @@ def my_callback(self):
 GPIO.add_event_callback(BELL_PIN, my_callback)
 
 while True:
-        pass
+     time.sleep(1000) # don't riun all the time
+
