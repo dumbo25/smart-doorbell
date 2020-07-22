@@ -7,7 +7,7 @@ echo "exit on failure"
 set -e
 
 # change to home directory
-# cd ~/.
+cd ~/.
 
 # the script requires the name of the script to download and install
 if [ $# = 0 ]
