@@ -13,17 +13,19 @@
 # modules
 import RPi.GPIO as GPIO
 import subprocess
-# import argparse
 import time
 
 # globals
 BELL_PIN = 24
+VOLUME = 75
 
-# parser = argparse.ArgumentParser()
+# On commands like play, prev and next, mpc outputs a line similar to:
+#
+#    volume: n/a repeat: off random: off single: off consume: off
+#
+# adding the following to any mpc command suppresses that output
 
-# group = parser.add_mutually_exclusive_group()
-# group.add_argument("-l", "--light", action="store_true")
-# group.add_argument("-o", "--off", action="store_true")
+limitMPCoutput = " | grep \"[-,'[']\""
 
 # Disable warnings
 GPIO.setwarnings(False)
@@ -33,14 +35,26 @@ GPIO.setmode(GPIO.BCM)
 GPIO.setup(BELL_PIN, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 GPIO.add_event_detect(BELL_PIN, GPIO.RISING)
 
-# args = parser.parse_args()
+# set volume
+cmd = "mpc volume " + str(VOLUME) + limitMPCoutput
+subprocess.call(cmd, shell=True)
 
+# clear playlist
+cmd = "mpc clear " + limitMPCoutput
+subprocess.call(cmd, shell=True)
+
+# add ring tone
+cmd = "mpc insert /home/pi/ring2.m4a" + limitMPCoutput
+subprocess.call(cmd, shell=True)
+
+# run this when the button is pressed
 def my_callback(self):
-    print 'Doorbell pushed!'
-    time.sleep(2)
+    cmd = "mpc play 1 " + limitMPCoutput
+    subprocess.call(cmd, shell=True)
+    time.sleep(1)
 
 GPIO.add_event_callback(BELL_PIN, my_callback)
 
+# loop forever and sleep most of the time
 while True:
-     time.sleep(1000) # don't riun all the time
-
+        time.sleep(1000)
